@@ -11,7 +11,7 @@
             <select name="{{ $field_name }}" class="form-control select2" {{ $required }}>
                 <option value="">{{ $field_placeholder }}</option>
                 @foreach($products as $product)
-                    <option value="{{ $product->n_prodotto }}" {{ $product->n_prodotto == $data->codice_prodotto ? 'selected' : '' }}>{{ $product->prodotto }}</option>
+                    <option value="{{ $product->n_prodotto }}" {{ $product->n_prodotto == optional($data)->codice_prodotto ? 'selected' : '' }}>{{ $product->prodotto }}</option>
                 @endforeach
             </select>
         </div>
@@ -28,7 +28,7 @@
             <select name="{{ $field_name }}" class="form-control select2" {{ $required }}>
                 <option value="">{{ $field_placeholder }}</option>
                 @foreach($users as $user)
-                    <option value="{{ $user->id }}" {{ $user->id == $data->id_user ? 'selected' : '' }}>{{ $user->first_name }}</option>
+                    <option value="{{ $user->id }}" {{ $user->id == optional($data)->id_user ? 'selected' : '' }}>{{ $user->first_name }}</option>
                 @endforeach
             </select>
         </div>

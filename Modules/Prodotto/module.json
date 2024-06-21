@@ -1,0 +1,13 @@
+{
+    "name": "Prodotto",
+    "alias": "prodotto",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Prodotto\\Providers\\ProdottoServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

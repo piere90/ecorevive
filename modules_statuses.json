@@ -2,5 +2,6 @@
     "Post": true,
     "Category": true,
     "Tag": true,
-    "Product": true
+    "Prodotto": true,
+    "Produzione": true
 }

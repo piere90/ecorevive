@@ -36,7 +36,7 @@
             @yield('content')
         </main>
 
-        @include('frontend.includes.footer')
+        <!--@include('frontend.includes.footer') -->
 
         <!-- Scripts -->
         @livewireScripts

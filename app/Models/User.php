@@ -37,6 +37,11 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'remember_token',
     ];
 
+    public function produzioni()
+    {
+        return $this->hasMany('Modules\Produzione\Models\Produzione', 'id_user', 'id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

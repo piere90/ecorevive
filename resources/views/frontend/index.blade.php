@@ -1,4 +1,4 @@
-@extends('frontend.layouts.app')
+@extends('frontend.layouts.frontend_app')
 
 @section('title')
     {{ app_name() }}
@@ -8,8 +8,9 @@
     <section class="bg-gray-50 pb-20 dark:bg-gray-700">
         <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
             <div class="rounded-lg p-3 shadow-lg dark:bg-gray-800 sm:p-10">
-                <img src="https://github.com/nasirkhan/laravel-starter/assets/396987/1cf5ce5a-f374-4bae-b5a3-69e8d7ff684d"
-                    alt="Page preview">
+                <div class="col-6">
+                    <x-backend.buttons.create route='{{ route("frontend.produzione.create") }}' title="{{__('Insaccamento')}}">INSACCAMENTO</x-backend.buttons.create>
+                </div>
             </div>
             <div class="rounded-lg p-3 shadow-lg dark:bg-gray-800 sm:p-10">
                 <img src="https://github.com/nasirkhan/laravel-starter/assets/396987/93341711-60dd-4624-8cd7-82f1c611287d"

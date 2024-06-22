@@ -19,6 +19,10 @@ class Produzione extends BaseModel
         'deleted_by',
         'codice_prodotto', 
         'id_user',// other fillable fields
+        'data_reale',
+        'progressivo',
+        'peso',
+        'note',
     ];
 
     // Specifica la chiave primaria

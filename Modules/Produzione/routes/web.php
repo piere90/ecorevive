@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Produzione\Http\Controllers\Frontend\ProduzionesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 *
 * --------------------------------------------------------------------
 */
+
+Route::get('produzione/create', [ProduzionesController::class, 'create'])->name('produzione.create');
+
 Route::group(['namespace' => '\Modules\Produzione\Http\Controllers\Frontend', 'as' => 'frontend.', 'middleware' => 'web', 'prefix' => ''], function () {
 
     /*
@@ -31,6 +35,8 @@ Route::group(['namespace' => '\Modules\Produzione\Http\Controllers\Frontend', 'a
     $controller_name = 'ProduzionesController';
     Route::get("$module_name", ['as' => "$module_name.index", 'uses' => "$controller_name@index"]);
     Route::get("$module_name/{id}/{slug?}", ['as' => "$module_name.show", 'uses' => "$controller_name@show"]);
+
+    Route::resource("$module_name", "$controller_name");
 });
 
 /*

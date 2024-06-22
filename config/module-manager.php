@@ -44,6 +44,8 @@ return [
             'views_backend_trash' => ['Resources/views/backend/stubViews/trash.blade.stub', 'Resources/views/backend/stubViews/trash.blade.php'],
             'views_frontend_index' => ['Resources/views/frontend/stubViews/index.blade.stub', 'Resources/views/frontend/stubViews/index.blade.php'],
             'views_frontend_show' => ['Resources/views/frontend/stubViews/show.blade.stub', 'Resources/views/frontend/stubViews/show.blade.php'],
+            'views_frontend_create' => ['Resources/views/frontend/stubViews/create.blade.stub', 'Resources/views/frontend/stubViews/create.blade.php'],
+            'views_frontend_form' => ['Resources/views/frontend/stubViews/form.blade.stub', 'Resources/views/frontend/stubViews/form.blade.php'],
         ],
     ],
 

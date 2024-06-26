@@ -29,6 +29,11 @@ class Prodotto extends BaseModel
         return $this->hasMany('Modules\Produzione\Models\Produzione', 'codice_prodotto', 'n_prodotto');
     }
 
+    public function formule()
+    {
+        return $this->hasMany('Modules\Formula\Models\Formula', 'id_prodotto', 'n_prodotto');
+    }
+
     /**
      * Create a new factory instance for the model.
      *

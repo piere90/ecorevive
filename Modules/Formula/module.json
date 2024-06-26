@@ -1,0 +1,13 @@
+{
+    "name": "Formula",
+    "alias": "formula",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Formula\\Providers\\FormulaServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

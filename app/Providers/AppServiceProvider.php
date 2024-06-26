@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,6 +44,12 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super admin') ? true : null;
         });
+
+        /*DB::listen(function ($query) {
+            Log::info($query->sql);
+            Log::info($query->bindings);
+            Log::info($query->time);
+        });*/
     }
 
     public function registerEventListeners()

@@ -3,5 +3,7 @@
     "Category": true,
     "Tag": true,
     "Prodotto": true,
-    "Produzione": true
+    "Produzione": true,
+    "Ingrediente": true,
+    "Formula": true
 }

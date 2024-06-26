@@ -50,6 +50,9 @@
                     <div class="col-2">
                         <input type="number" name="ingredienti[{{ $i }}][quantita]" class="form-control" placeholder="Quantità" step="0.01" value="{{ isset($formula_ingredienti[$i]) ? $formula_ingredienti[$i]->pivot['quantita'] : '' }}">
                     </div>
+                    <div class="col-2">
+                        <input type="text" name="ingredienti[{{ $i }}][herz]" class="form-control" placeholder="Herz" value="{{ isset($formula_ingredienti[$i]) ? $formula_ingredienti[$i]->pivot['herz'] : '' }}">
+                    </div>
                 </div>
             @endfor
         </div>

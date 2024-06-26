@@ -34,7 +34,15 @@
                     @if (!empty($formula_ingredienti))
                         <ul>
                             @foreach ($formula_ingredienti as $ingrediente)
-                                <li>{!! $ingrediente['nome'] !!} ({!! $ingrediente->pivot['quantita'] !!})</li>
+                                <li>
+                                    {!! $ingrediente['nome'] !!} 
+                                    @if (!empty($ingrediente->pivot['quantita']))
+                                        (Qt. {!! $ingrediente->pivot['quantita'] !!})
+                                    @endif
+                                    @if (!empty($ingrediente->pivot['herz']))
+                                        ({!! $ingrediente->pivot['herz'] !!} Hz)
+                                    @endif
+                                </li>
                             @endforeach
                         </ul>
                     @else

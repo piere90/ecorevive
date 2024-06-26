@@ -33,7 +33,7 @@ class Ingrediente extends BaseModel
     public function formule()
     {
         return $this->belongsToMany(Formula::class, 'formula_ingredienti', 'id_ingrediente', 'id_formula')
-                    ->withPivot('quantita', 'created_at', 'updated_at')
+                    ->withPivot('quantita', 'herz', 'created_at', 'updated_at')
                     ->withTimestamps();
     }
 }

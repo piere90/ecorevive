@@ -60,7 +60,8 @@ class FormulasController extends BackendBaseController
         return Datatables::of($data)
             ->addColumn('ingredienti', function ($formula) {
                 return $formula->ingredienti->map(function ($ingrediente) {
-                    return $ingrediente->nome . ' (' . $ingrediente->pivot->quantita . ')';
+                    $hertzString = isset($ingrediente->pivot->herz) ? ' (' . $ingrediente->pivot->herz . ' Hz.)' : '';
+                    return $ingrediente->nome . ' (Qt. ' . $ingrediente->pivot->quantita . ')'.$hertzString;
                 })->implode('<br>');
             })
             ->addColumn('action', function ($data) {
@@ -119,7 +120,6 @@ class FormulasController extends BackendBaseController
      */
     public function store(Request $request)
     {
-        //dd($request);
         $module_title = $this->module_title;
         $module_name = $this->module_name;
         $module_path = $this->module_path;
@@ -146,8 +146,12 @@ class FormulasController extends BackendBaseController
 
         // Aggiungi gli ingredienti
         foreach ($request->ingredienti as $ingrediente) {
-            if (!empty($ingrediente['id']) && !empty($ingrediente['quantita'])) {
-                $$module_name_singular->ingredienti()->attach($ingrediente['id'], ['quantita' => $ingrediente['quantita']]);
+            if (!empty($ingrediente['id'])) {
+                $data = [
+                    'quantita' => $ingrediente['quantita'] ?? null,
+                    'herz' => $ingrediente['herz'] ?? null,
+                ];
+                $$module_name_singular->ingredienti()->attach($ingrediente['id'], $data);
             }
         }
 
@@ -246,7 +250,10 @@ class FormulasController extends BackendBaseController
         $ingredienti = [];
         foreach ($request->ingredienti as $ingrediente) {
             if (!empty($ingrediente['id']) && !empty($ingrediente['quantita'])) {
-                $ingredienti[$ingrediente['id']] = ['quantita' => $ingrediente['quantita']];
+                $ingredienti[$ingrediente['id']] = [
+                    'quantita' => $ingrediente['quantita'],
+                    'herz' => $ingrediente['herz']
+                ];
             }
         }
         $formula->ingredienti()->sync($ingredienti);
@@ -296,11 +303,15 @@ class FormulasController extends BackendBaseController
         $productChanged = $formula->id_prodotto != $request->input('id_prodotto');
 
         // Controlla se gli ingredienti sono stati modificati
-        $existingIngredients = $formula->ingredienti->pluck('pivot.quantita', 'pivot.id_ingrediente')->toArray();
+        $existingIngredients = $formula->ingredienti->pluck('pivot.quantita', 'pivot.herz', 'pivot.id_ingrediente')->toArray();
         $newIngredients = [];
         foreach ($request->ingredienti as $ingrediente) {
             if (!empty($ingrediente['id']) && !empty($ingrediente['quantita'])) {
-                $newIngredients[$ingrediente['id']] = $ingrediente['quantita'];
+                $newIngredients[$ingrediente['id']] = [
+                    'quantita' => $ingrediente['quantita'],
+                    'herz' => $ingrediente['herz']
+                ];
+                
             }
         }
 

@@ -5,6 +5,7 @@ namespace Modules\Formula\Http\Controllers\Backend;
 use App\Authorizable;
 use App\Http\Controllers\Backend\BackendBaseController;
 use Modules\Prodotto\Models\Prodotto;
+use Modules\Formula\Models\Formula;
 use Modules\Ingrediente\Models\Ingrediente;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
@@ -217,6 +218,7 @@ class FormulasController extends BackendBaseController
      */
     public function update(Request $request, $id)
     {
+        //dd($request);
         $module_title = $this->module_title;
         $module_name = $this->module_name;
         $module_path = $this->module_path;
@@ -235,28 +237,8 @@ class FormulasController extends BackendBaseController
         // Recupera la formula
         $formula = $module_model::with('ingredienti', 'prodotto')->where('numero', $id)->firstOrFail();
 
-        //verifico se devo aumentare la versione della formula
-        $this->updateVersioneFormula($formula, $request);
-
-        // Aggiorna i campi della formula
-        $formula->update([
-            'id_prodotto' => $request->input('id_prodotto'),
-            'prodotto' => Prodotto::find($request->id_prodotto)->prodotto,
-            'versione' => $formula->versione,
-            'updated_at' => now(),
-        ]);
-
-        // Sincronizza gli ingredienti
-        $ingredienti = [];
-        foreach ($request->ingredienti as $ingrediente) {
-            if (!empty($ingrediente['id']) && !empty($ingrediente['quantita'])) {
-                $ingredienti[$ingrediente['id']] = [
-                    'quantita' => $ingrediente['quantita'],
-                    'herz' => $ingrediente['herz']
-                ];
-            }
-        }
-        $formula->ingredienti()->sync($ingredienti);
+        // Verifica e gestisce le modifiche della formula
+        $this->handleFormulaUpdate($formula, $request, $module_action);
 
         flash(Str::singular($module_title)."' Updated Successfully")->success()->important();
 
@@ -297,32 +279,100 @@ class FormulasController extends BackendBaseController
         );
     }
 
-    private function updateVersioneFormula($formula, $request)
+    private function handleFormulaUpdate($formula, $request, $module_action)
     {
-        // Controlla se il prodotto è stato modificato
+        // Verifica se il prodotto è stato modificato
         $productChanged = $formula->id_prodotto != $request->input('id_prodotto');
 
-        // Controlla se gli ingredienti sono stati modificati
-        $existingIngredients = $formula->ingredienti->pluck('pivot.quantita', 'pivot.herz', 'pivot.id_ingrediente')->toArray();
-        $newIngredients = [];
+        // Verifica se gli ingredienti sono stati modificati
+        $ingredientsChanged = $this->ingredientsChanged($formula, $request);
+
+        if ($ingredientsChanged && !$productChanged) {
+            // Crea una nuova formula con versione incrementata
+            $this->createNewVersion($formula, $request, $module_action);
+        } else {
+            // Aggiorna la formula esistente
+            $this->updateExistingFormula($formula, $request);
+        }
+    }
+
+    private function createNewVersion($formula, $request, $module_action)
+    {
+        // Trova l'ultima versione della formula per questo prodotto
+        $latestVersion = Formula::where('id_prodotto', $formula->id_prodotto)
+            ->orderBy('versione', 'desc')
+            ->first();
+    
+        // Incrementa la versione
+        $newVersion = $latestVersion ? $latestVersion->versione + 1 : 1;
+    
+        // Crea una nuova formula con versione incrementata
+        $nuova_formula = $formula->replicate();
+        $nuova_formula->versione = $newVersion;
+        $nuova_formula->save();
+    
+        // Aggiungi gli ingredienti alla nuova formula
+        $ingredienti = [];
         foreach ($request->ingredienti as $ingrediente) {
-            if (!empty($ingrediente['id']) && !empty($ingrediente['quantita'])) {
-                $newIngredients[$ingrediente['id']] = [
+            if (!empty($ingrediente['id']) && (!empty($ingrediente['quantita']) || !empty($ingrediente['herz']))) {
+                $ingredienti[$ingrediente['id']] = [
                     'quantita' => $ingrediente['quantita'],
-                    'herz' => $ingrediente['herz']
+                    'herz' => $ingrediente['herz'] ?? null
                 ];
-                
             }
         }
-
-        $ingredientsChanged = $existingIngredients != $newIngredients;
-
-        // Se gli ingredienti sono cambiati e il prodotto non è cambiato, incrementa la versione
-        if ($ingredientsChanged && !$productChanged) {
-            $formula->versione += 1;
-        }
-
-        return $formula;
+        $nuova_formula->ingredienti()->sync($ingredienti);
+    
+        flash("New version '".Str::singular($this->module_title)."' Added")->success()->important();
+        logUserAccess($this->module_title.' '.$module_action.' | New Id: '.$nuova_formula->numero);
     }
+    
+
+
+    private function ingredientsChanged($formula, $request)
+    {
+        // Controlla se gli ingredienti sono stati modificati
+        $existingIngredients = $formula->ingredienti->mapWithKeys(function ($item) {
+            return [$item->pivot->id_ingrediente => [
+                'quantita' => $item->pivot->quantita,
+                'herz' => $item->pivot->herz,
+            ]];
+        })->toArray();
+    
+        $newIngredients = [];
+        foreach ($request->ingredienti as $ingrediente) {
+            if (!empty($ingrediente['id']) && (!empty($ingrediente['quantita'] || !empty($ingrediente['herz'])))) {
+                $newIngredients[$ingrediente['id']] = [
+                    'quantita' => $ingrediente['quantita'],
+                    'herz' => $ingrediente['herz'] ?? null,
+                ];
+            }
+        }
+    
+        return $existingIngredients != $newIngredients;
+    }
+
+    private function updateExistingFormula($formula, $request)
+    {
+        // Aggiorna i campi della formula
+        $formula->update([
+            'id_prodotto' => $request->input('id_prodotto'),
+            'prodotto' => Prodotto::find($request->id_prodotto)->prodotto,
+            'updated_at' => now(),
+        ]);
+
+        // Sincronizza gli ingredienti
+        $ingredienti = [];
+        foreach ($request->ingredienti as $ingrediente) {
+            if (!empty($ingrediente['id']) && (!empty($ingrediente['quantita']) || !empty($ingrediente['herz']))) {
+                $ingredienti[$ingrediente['id']] = [
+                    'quantita' => $ingrediente['quantita'],
+                    'herz' => $ingrediente['herz'] ?? null
+                ];
+            }
+        }
+        $formula->ingredienti()->sync($ingredienti);
+    }
+
 
 }

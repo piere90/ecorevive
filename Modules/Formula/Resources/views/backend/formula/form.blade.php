@@ -36,7 +36,7 @@
         <div class="form-group">
             {{ html()->label('Ingredienti')->class('form-label') }}
             @for($i = 0; $i < 10; $i++)
-                <div class="row mb-3">
+                <div class="row mb-3 align-items-center">
                     <div class="col-4">
                         <select name="ingredienti[{{ $i }}][id]" class="form-control select2">
                             <option value="">{{ __('Seleziona Ingrediente') }}</option>
@@ -48,16 +48,18 @@
                         </select>
                     </div>
                     <div class="col-2">
-                        <input type="number" name="ingredienti[{{ $i }}][quantita]" class="form-control" placeholder="Quantità" step="0.01" value="{{ isset($formula_ingredienti[$i]) ? $formula_ingredienti[$i]->pivot['quantita'] : '' }}">
+                        <input type="number" name="ingredienti[{{ $i }}][quantita]" class="form-control" placeholder="Quantità" step="0.01" value="{{ isset($formula_ingredienti[$i]) ? $formula_ingredienti[$i]['pivot']['quantita'] : '' }}">
                     </div>
                     <div class="col-2">
-                        <input type="text" name="ingredienti[{{ $i }}][herz]" class="form-control" placeholder="Herz" value="{{ isset($formula_ingredienti[$i]) ? $formula_ingredienti[$i]->pivot['herz'] : '' }}">
+                        <input type="text" name="ingredienti[{{ $i }}][herz]" class="form-control" placeholder="Herz" value="{{ isset($formula_ingredienti[$i]) ? $formula_ingredienti[$i]['pivot']['herz'] : '' }}">
                     </div>
                 </div>
             @endfor
         </div>
     </div>
 </div>
+
+
 
 
 <x-library.select2 />
